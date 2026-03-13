@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Travel Movies - Interactive Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-card: #1a2234;
+    --bg-card-hover: #1f2a40;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.15);
+    --accent-dim: #1e6a96;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: #1e293b;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(56,189,248,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8 0%, #a78bfa 50%, #f472b6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  .hero p {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .controls {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 23, 0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .search-box::before {
+    content: '\1F50D';
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    opacity: 0.5;
+  }
+
+  select {
+    padding: 0.7rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .chip {
+    padding: 0.4rem 0.9rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .chip:hover {
+    border-color: var(--accent-dim);
+    color: var(--text-primary);
+  }
+
+  .chip.active {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .stats-bar {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .movie-count {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .table-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  thead th {
+    background: var(--bg-secondary);
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  thead th:hover {
+    color: var(--accent);
+  }
+
+  thead th.sorted-asc::after { content: ' \2191'; color: var(--accent); }
+  thead th.sorted-desc::after { content: ' \2193'; color: var(--accent); }
+
+  tbody tr {
+    transition: all 0.15s;
+  }
+
+  tbody tr:hover {
+    background: var(--bg-card-hover);
+  }
+
+  tbody td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+    vertical-align: top;
+  }
+
+  .movie-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .movie-year {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin-left: 0.4rem;
+  }
+
+  .rt-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .rt-fresh { background: rgba(74, 222, 128, 0.12); color: var(--green); }
+  .rt-good { background: rgba(251, 191, 36, 0.12); color: var(--yellow); }
+  .rt-mixed { background: rgba(248, 113, 113, 0.12); color: var(--red); }
+
+  .genre-tag {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    background: rgba(167, 139, 250, 0.1);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--purple);
+    margin: 0.15rem 0.2rem 0.15rem 0;
+    white-space: nowrap;
+  }
+
+  .synopsis {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    max-width: 350px;
+  }
+
+  .streaming-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .stream-tag {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .stream-netflix { background: rgba(229, 9, 20, 0.15); color: #e50914; border: 1px solid rgba(229, 9, 20, 0.25); }
+  .stream-prime { background: rgba(0, 168, 225, 0.12); color: #00a8e1; border: 1px solid rgba(0, 168, 225, 0.2); }
+  .stream-hulu { background: rgba(28, 231, 131, 0.12); color: #1ce783; border: 1px solid rgba(28, 231, 131, 0.2); }
+  .stream-disney { background: rgba(17, 60, 207, 0.15); color: #6b8bfa; border: 1px solid rgba(17, 60, 207, 0.25); }
+  .stream-hbo { background: rgba(150, 60, 255, 0.12); color: #b47cff; border: 1px solid rgba(150, 60, 255, 0.2); }
+  .stream-paramount { background: rgba(0, 100, 255, 0.12); color: #4d9aff; border: 1px solid rgba(0, 100, 255, 0.2); }
+  .stream-tubi { background: rgba(255, 128, 0, 0.12); color: var(--orange); border: 1px solid rgba(255, 128, 0, 0.2); }
+  .stream-rent { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border: 1px solid rgba(100, 116, 139, 0.25); }
+  .stream-free { background: rgba(74, 222, 128, 0.1); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.2); }
+  .stream-apple { background: rgba(255, 255, 255, 0.08); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.15); }
+  .stream-criterion { background: rgba(255, 200, 50, 0.1); color: #e6c54a; border: 1px solid rgba(255, 200, 50, 0.2); }
+  .stream-peacock { background: rgba(0, 200, 150, 0.1); color: #40d9a8; border: 1px solid rgba(0, 200, 150, 0.2); }
+
+  .director { color: var(--text-secondary); font-size: 0.88rem; }
+
+  .time-type {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 5px;
+    font-weight: 500;
+    display: inline-block;
+  }
+
+  .type-loop { background: rgba(244, 114, 182, 0.12); color: var(--pink); border: 1px solid rgba(244, 114, 182, 0.2); }
+  .type-travel { background: rgba(56, 189, 248, 0.12); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.2); }
+  .type-paradox { background: rgba(251, 146, 60, 0.12); color: var(--orange); border: 1px solid rgba(251, 146, 60, 0.2); }
+  .type-alt { background: rgba(167, 139, 250, 0.12); color: var(--purple); border: 1px solid rgba(167, 139, 250, 0.2); }
+
+  .no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+
+  .no-results span { font-size: 2.5rem; display: block; margin-bottom: 1rem; }
+
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 2rem 1rem 1.5rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero p { font-size: 0.9rem; }
+
+    .controls {
+      padding: 0.75rem 1rem;
+      gap: 0.6rem;
+    }
+
+    .search-box { min-width: 100%; }
+
+    .search-box input,
+    select {
+      padding: 0.65rem 1rem 0.65rem 2.6rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      -webkit-appearance: none;
+    }
+
+    select {
+      padding-left: 1rem;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .filter-chips { gap: 0.4rem; }
+
+    .chip {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.78rem;
+    }
+
+    .stats-bar {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .table-container {
+      padding: 0 0.75rem 2rem;
+      overflow-x: hidden;
+    }
+
+    table, thead, tbody, tr, th, td {
+      display: block;
+    }
+
+    thead { display: none; }
+
+    tbody tr {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-card-hover);
+    }
+
+    tbody td {
+      padding: 0;
+      border-bottom: none;
+      font-size: 0.88rem;
+    }
+
+    /* Title cell */
+    tbody td:nth-child(1) {
+      order: 1;
+    }
+
+    .movie-title { font-size: 1.05rem; }
+
+    /* Hide standalone year column (already shown next to title) */
+    tbody td:nth-child(2) { display: none; }
+
+    /* RT score */
+    tbody td:nth-child(3) { order: 2; }
+
+    /* Type */
+    tbody td:nth-child(4) { order: 3; display: inline; }
+
+    /* Genres */
+    tbody td:nth-child(5) { order: 4; }
+
+    /* Director */
+    tbody td:nth-child(6) {
+      order: 5;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    tbody td:nth-child(6)::before {
+      content: 'Dir: ';
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    /* Synopsis */
+    tbody td:nth-child(7) {
+      order: 6;
+    }
+
+    .synopsis {
+      max-width: 100%;
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+
+    /* Streaming */
+    tbody td:nth-child(8) { order: 7; }
+
+    .streaming-tags { gap: 0.35rem; }
+
+    .rt-score { font-size: 0.95rem; }
+
+    .footer { padding: 1.5rem 1rem; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Time Travel Movies</h1>
+  <p>The ultimate interactive guide to the best time travel films, sorted by Rotten Tomatoes score. Filter, sort, and find your next watch.</p>
+</div>
+
+<div class="controls">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search movies, directors, synopses..." oninput="filterMovies()">
+  </div>
+  <select id="decadeFilter" onchange="filterMovies()">
+    <option value="">All Decades</option>
+    <option value="2020">2020s</option>
+    <option value="2010">2010s</option>
+    <option value="2000">2000s</option>
+    <option value="1990">1990s</option>
+    <option value="1980">1980s &amp; Earlier</option>
+  </select>
+  <select id="typeFilter" onchange="filterMovies()">
+    <option value="">All Types</option>
+    <option value="Time Travel">Time Travel</option>
+    <option value="Time Loop">Time Loop</option>
+    <option value="Paradox">Paradox</option>
+    <option value="Alt Timeline">Alt Timeline</option>
+  </select>
+  <select id="streamFilter" onchange="filterMovies()">
+    <option value="">All Streaming</option>
+    <option value="Netflix">Netflix</option>
+    <option value="Prime">Prime Video</option>
+    <option value="Hulu">Hulu</option>
+    <option value="Disney+">Disney+</option>
+    <option value="Max">Max (HBO)</option>
+    <option value="Paramount+">Paramount+</option>
+    <option value="Tubi">Tubi (Free)</option>
+    <option value="Criterion">Criterion</option>
+  </select>
+  <div class="filter-chips">
+    <span class="chip" data-min="90" onclick="toggleScoreFilter(this)">90%+</span>
+    <span class="chip" data-min="80" onclick="toggleScoreFilter(this)">80%+</span>
+    <span class="chip" data-min="70" onclick="toggleScoreFilter(this)">70%+</span>
+    <span class="chip" data-genre="Sci-Fi" onclick="toggleGenreFilter(this)">Sci-Fi</span>
+    <span class="chip" data-genre="Comedy" onclick="toggleGenreFilter(this)">Comedy</span>
+    <span class="chip" data-genre="Romance" onclick="toggleGenreFilter(this)">Romance</span>
+    <span class="chip" data-genre="Thriller" onclick="toggleGenreFilter(this)">Thriller</span>
+    <span class="chip" data-genre="Action" onclick="toggleGenreFilter(this)">Action</span>
+    <span class="chip" data-genre="Horror" onclick="toggleGenreFilter(this)">Horror</span>
+    <span class="chip" data-genre="Animation" onclick="toggleGenreFilter(this)">Animation</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <span>Showing <span class="movie-count" id="movieCount">0</span> movies</span>
+  <span>Click any column header to sort</span>
+</div>
+
+<div class="table-container">
+  <table id="movieTable">
+    <thead>
+      <tr>
+        <th data-col="title" onclick="sortTable('title')">Title</th>
+        <th data-col="year" onclick="sortTable('year')">Year</th>
+        <th data-col="rt" onclick="sortTable('rt')" class="sorted-desc">RT Score</th>
+        <th data-col="type">Type</th>
+        <th data-col="genre">Genre</th>
+        <th data-col="director" onclick="sortTable('director')">Director</th>
+        <th data-col="synopsis">Synopsis</th>
+        <th data-col="streaming">Where to Watch</th>
+      </tr>
+    </thead>
+    <tbody id="movieBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults" style="display:none;">
+    <span>&#128368;</span>
+    No movies match your filters. Try adjusting your search!
+  </div>
+</div>
+
+<div class="footer">
+  Data compiled March 2026. Streaming availability may change. Scores from Rotten Tomatoes.
+</div>
+
+<script>
+const movies = [
+  {
+    title: "Your Name (Kimi no Na wa)",
+    year: 2016,
+    rt: 98,
+    type: "Time Travel",
+    genres: ["Animation", "Romance", "Sci-Fi"],
+    director: "Makoto Shinkai",
+    synopsis: "Two teenagers share a mysterious connection when they discover they are swapping bodies across time and space. A visually stunning, emotionally devastating masterpiece.",
+    streaming: [{name:"Paramount+", cls:"paramount"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Groundhog Day",
+    year: 1993,
+    rt: 94,
+    type: "Time Loop",
+    genres: ["Comedy", "Romance"],
+    director: "Harold Ramis",
+    synopsis: "A cynical TV weatherman finds himself reliving the same day over and over in a small Pennsylvania town. The film that defined the time-loop genre.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Back to the Future",
+    year: 1985,
+    rt: 93,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Comedy", "Adventure"],
+    director: "Robert Zemeckis",
+    synopsis: "Marty McFly is accidentally sent back to 1955 in a time-traveling DeLorean and must make sure his parents fall in love or he'll cease to exist.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Arrival",
+    year: 2016,
+    rt: 94,
+    type: "Alt Timeline",
+    genres: ["Sci-Fi", "Drama"],
+    director: "Denis Villeneuve",
+    synopsis: "A linguist enlisted to communicate with alien visitors discovers their language unlocks a radical perception of time, redefining past, present, and future.",
+    streaming: [{name:"Hulu", cls:"hulu"}, {name:"Paramount+", cls:"paramount"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Palm Springs",
+    year: 2020,
+    rt: 95,
+    type: "Time Loop",
+    genres: ["Comedy", "Romance", "Sci-Fi"],
+    director: "Max Barbakow",
+    synopsis: "Two wedding guests get stuck in an infinite time loop, forced to relive the same day together. Smart, hilarious, and surprisingly moving.",
+    streaming: [{name:"Hulu", cls:"hulu"}, {name:"Disney+", cls:"disney"}]
+  },
+  {
+    title: "Looper",
+    year: 2012,
+    rt: 93,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Action", "Thriller"],
+    director: "Rian Johnson",
+    synopsis: "In 2074, the mob sends targets back in time for hitmen called 'loopers' to eliminate. Joe's life is upended when his future self is sent back as his next target.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Midnight in Paris",
+    year: 2011,
+    rt: 93,
+    type: "Time Travel",
+    genres: ["Comedy", "Romance"],
+    director: "Woody Allen",
+    synopsis: "A nostalgic screenwriter on a trip to Paris discovers he can travel back to the 1920s each night at midnight, mingling with Hemingway, Fitzgerald, and Dali.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Edge of Tomorrow",
+    year: 2014,
+    rt: 91,
+    type: "Time Loop",
+    genres: ["Sci-Fi", "Action"],
+    director: "Doug Liman",
+    synopsis: "A soldier fighting aliens gets caught in a time loop, reliving the same brutal battle. Each death teaches him more, turning a coward into humanity's best weapon.",
+    streaming: [{name:"Max", cls:"hbo"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Terminator 2: Judgment Day",
+    year: 1991,
+    rt: 91,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Action"],
+    director: "James Cameron",
+    synopsis: "A reprogrammed Terminator is sent back in time to protect young John Connor from a more advanced, shape-shifting assassin. A genre-defining action epic.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Source Code",
+    year: 2011,
+    rt: 92,
+    type: "Time Loop",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Duncan Jones",
+    synopsis: "A soldier wakes up in another man's body on a train, reliving the same 8 minutes to identify a bomber before another attack. Tight, clever, and riveting.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Roku Ch.", cls:"free"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Timecrimes (Los Cronocrimenes)",
+    year: 2007,
+    rt: 90,
+    type: "Paradox",
+    genres: ["Sci-Fi", "Thriller", "Horror"],
+    director: "Nacho Vigalondo",
+    synopsis: "A man accidentally travels one hour into the past and triggers a chain of increasingly complicated and sinister events involving multiple versions of himself.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Safety Not Guaranteed",
+    year: 2012,
+    rt: 91,
+    type: "Time Travel",
+    genres: ["Comedy", "Romance", "Sci-Fi"],
+    director: "Colin Trevorrow",
+    synopsis: "Magazine interns investigate a man who placed a classified ad seeking a companion for time travel. What starts as a joke becomes something much more sincere.",
+    streaming: [{name:"Prime", cls:"prime"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "The Terminator",
+    year: 1984,
+    rt: 90,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Action"],
+    director: "James Cameron",
+    synopsis: "A cybernetic assassin from 2029 is sent back to 1984 to kill the mother of the future resistance leader. A relentless, perfectly crafted sci-fi thriller.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "12 Monkeys",
+    year: 1995,
+    rt: 88,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Terry Gilliam",
+    synopsis: "A convict is sent back in time to gather information about a deadly virus that wiped out most of humanity. A mind-bending, visually inventive classic.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Donnie Darko",
+    year: 2001,
+    rt: 88,
+    type: "Alt Timeline",
+    genres: ["Sci-Fi", "Thriller", "Drama"],
+    director: "Richard Kelly",
+    synopsis: "A troubled teenager is visited by a giant rabbit that tells him the world will end in 28 days. A cult classic blending time travel, philosophy, and dread.",
+    streaming: [{name:"Hulu", cls:"hulu"}, {name:"Criterion", cls:"criterion"}, {name:"Tubi", cls:"tubi"}]
+  },
+  {
+    title: "Predestination",
+    year: 2014,
+    rt: 84,
+    type: "Paradox",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Spierig Brothers",
+    synopsis: "A time-traveling agent pursues an elusive criminal across decades. Based on Heinlein's story, this is the ultimate bootstrap paradox film with jaw-dropping twists.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Primer",
+    year: 2004,
+    rt: 72,
+    type: "Paradox",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Shane Carruth",
+    synopsis: "Two engineers accidentally build a time machine in their garage. Made for $7,000, this is the hardest, most scientifically rigorous time travel film ever made.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "About Time",
+    year: 2013,
+    rt: 70,
+    type: "Time Travel",
+    genres: ["Romance", "Comedy", "Drama"],
+    director: "Richard Curtis",
+    synopsis: "A young man discovers he can travel in time and uses his ability to pursue love and improve his life, only to learn that living well matters more than fixing mistakes.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Interstellar",
+    year: 2014,
+    rt: 73,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Drama", "Adventure"],
+    director: "Christopher Nolan",
+    synopsis: "A group of explorers travel through a wormhole near Saturn to find a new home for humanity. Time dilation and relativity become devastatingly personal.",
+    streaming: [{name:"Paramount+", cls:"paramount"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Tenet",
+    year: 2020,
+    rt: 69,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Action", "Thriller"],
+    director: "Christopher Nolan",
+    synopsis: "A CIA operative learns to manipulate the flow of time through 'inversion' to prevent a future apocalypse. Nolan's most complex, polarizing puzzle box.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "The Girl Who Leapt Through Time",
+    year: 2006,
+    rt: 83,
+    type: "Time Travel",
+    genres: ["Animation", "Romance", "Sci-Fi"],
+    director: "Mamoru Hosoda",
+    synopsis: "A high schooler gains the power to leap through time and uses it to fix everyday problems, only to discover every change has unintended consequences.",
+    streaming: [{name:"Max", cls:"hbo"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Happy Death Day",
+    year: 2017,
+    rt: 71,
+    type: "Time Loop",
+    genres: ["Horror", "Comedy", "Thriller"],
+    director: "Christopher Landon",
+    synopsis: "A college student relives her birthday murder over and over, using each loop to identify her masked killer. Groundhog Day meets slasher film.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "X-Men: Days of Future Past",
+    year: 2014,
+    rt: 90,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Action"],
+    director: "Bryan Singer",
+    synopsis: "Wolverine is sent back to 1973 to prevent an event that leads to a dystopian future where mutants are hunted by Sentinels. The best X-Men film.",
+    streaming: [{name:"Disney+", cls:"disney"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Bill & Ted's Excellent Adventure",
+    year: 1989,
+    rt: 81,
+    type: "Time Travel",
+    genres: ["Comedy", "Sci-Fi"],
+    director: "Stephen Herek",
+    synopsis: "Two slacker teens travel through time in a phone booth to assemble historical figures for their history presentation. Totally excellent, dude.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "The Adam Project",
+    year: 2022,
+    rt: 68,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Action", "Comedy"],
+    director: "Shawn Levy",
+    synopsis: "A time-traveling pilot teams up with his 12-year-old self and his late father to save the future. Fun, family-friendly Ryan Reynolds vehicle.",
+    streaming: [{name:"Netflix", cls:"netflix"}]
+  },
+  {
+    title: "See You Yesterday",
+    year: 2019,
+    rt: 93,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Drama"],
+    director: "Stefon Bristol",
+    synopsis: "Two Brooklyn teens build makeshift time machines to save a loved one from a fatal police shooting. Inventive, urgent, and emotionally powerful.",
+    streaming: [{name:"Netflix", cls:"netflix"}]
+  },
+  {
+    title: "Omni Loop",
+    year: 2024,
+    rt: 84,
+    type: "Time Loop",
+    genres: ["Sci-Fi", "Drama", "Comedy"],
+    director: "Bernardo Britto",
+    synopsis: "A quantum physicist stuck in a week-long time loop teams up with a gifted student to finally break free. A gorgeous meditation on mortality and regret.",
+    streaming: [{name:"Hulu", cls:"hulu"}]
+  },
+  {
+    title: "Frequency",
+    year: 2000,
+    rt: 80,
+    type: "Alt Timeline",
+    genres: ["Sci-Fi", "Thriller", "Drama"],
+    director: "Gregory Hoblit",
+    synopsis: "A detective communicates with his dead father 30 years in the past via a ham radio during an aurora borealis, altering the present with each conversation.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "The Butterfly Effect",
+    year: 2004,
+    rt: 34,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Eric Bress",
+    synopsis: "A man discovers he can travel back to traumatic childhood events and change them, but each fix creates horrifying new consequences. Polarizing but gripping.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Tim Travers & the Time Traveler's Paradox",
+    year: 2024,
+    rt: 74,
+    type: "Paradox",
+    genres: ["Comedy", "Sci-Fi"],
+    director: "Stimson Snead",
+    synopsis: "A trippy, low-budget sci-fi comedy that pushes time travel paradoxes to absurd extremes. Features Danny Trejo, Joel McHale, and Keith David.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Plex", cls:"free"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Hot Tub Time Machine",
+    year: 2010,
+    rt: 64,
+    type: "Time Travel",
+    genres: ["Comedy", "Sci-Fi"],
+    director: "Steve Pink",
+    synopsis: "Four friends accidentally travel back to 1986 via a malfunctioning hot tub. Raunchy, absurd, and more fun than it has any right to be.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Time Trap",
+    year: 2017,
+    rt: 56,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Adventure"],
+    director: "Ben Foster & Mark Dennis",
+    synopsis: "Students search for a missing professor in a cave where time moves differently. Low-budget gem with a wild concept that escalates beautifully.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "ARQ",
+    year: 2016,
+    rt: 62,
+    type: "Time Loop",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Tony Elliott",
+    synopsis: "A couple wakes up each morning trapped in a time loop in their home, with armed intruders after a mysterious energy device. Tight, claustrophobic thriller.",
+    streaming: [{name:"Netflix", cls:"netflix"}]
+  },
+  {
+    title: "The Map of Tiny Perfect Things",
+    year: 2021,
+    rt: 82,
+    type: "Time Loop",
+    genres: ["Romance", "Comedy", "Sci-Fi"],
+    director: "Ian Samuels",
+    synopsis: "Two teens trapped in a time loop map out all the tiny beautiful moments that happen in their town each day, finding meaning in repetition.",
+    streaming: [{name:"Prime", cls:"prime"}]
+  },
+  {
+    title: "Everything Everywhere All at Once",
+    year: 2022,
+    rt: 93,
+    type: "Alt Timeline",
+    genres: ["Sci-Fi", "Action", "Comedy"],
+    director: "Daniels",
+    synopsis: "A laundromat owner discovers she can access the skills of alternate-universe versions of herself to save the multiverse. A wild, heartfelt masterpiece.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Coherence",
+    year: 2013,
+    rt: 88,
+    type: "Alt Timeline",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "James Ward Byrkit",
+    synopsis: "A dinner party unravels when a comet passes overhead and parallel realities begin bleeding together. A masterclass in low-budget sci-fi tension.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Prime", cls:"prime"}]
+  },
+  {
+    title: "Triangle",
+    year: 2009,
+    rt: 79,
+    type: "Time Loop",
+    genres: ["Thriller", "Horror", "Sci-Fi"],
+    director: "Christopher Smith",
+    synopsis: "A group stranded at sea boards a mysterious ocean liner where reality loops and splinters. A deeply underrated puzzle-box horror film.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Frequently Asked Questions About Time Travel",
+    year: 2009,
+    rt: 65,
+    type: "Time Travel",
+    genres: ["Comedy", "Sci-Fi"],
+    director: "Gareth Carrivick",
+    synopsis: "Three socially awkward friends discover a time leak in their local pub and must navigate paradoxes while trying not to destroy reality.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Somewhere in Time",
+    year: 1980,
+    rt: 59,
+    type: "Time Travel",
+    genres: ["Romance", "Drama"],
+    director: "Jeannot Szwarc",
+    synopsis: "A playwright uses self-hypnosis to travel back to 1912 and find a woman from an old photograph. A deeply romantic cult classic.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Project Almanac",
+    year: 2015,
+    rt: 35,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Dean Israelite",
+    synopsis: "Teens discover plans for a time machine and build it, using it for personal gain before consequences spiral. Found-footage time travel.",
+    streaming: [{name:"Paramount+", cls:"paramount"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Time Bandits",
+    year: 1981,
+    rt: 90,
+    type: "Time Travel",
+    genres: ["Comedy", "Adventure", "Sci-Fi"],
+    director: "Terry Gilliam",
+    synopsis: "A young boy joins a band of time-traveling dwarves who jump through holes in the space-time fabric to steal treasure across history.",
+    streaming: [{name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Star Trek IV: The Voyage Home",
+    year: 1986,
+    rt: 85,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Comedy", "Adventure"],
+    director: "Leonard Nimoy",
+    synopsis: "The Enterprise crew travels back to 1986 San Francisco to bring humpback whales to the future and save Earth. The funniest and most accessible Trek film.",
+    streaming: [{name:"Paramount+", cls:"paramount"}]
+  },
+  {
+    title: "Boss Level",
+    year: 2021,
+    rt: 73,
+    type: "Time Loop",
+    genres: ["Action", "Sci-Fi", "Comedy"],
+    director: "Joe Carnahan",
+    synopsis: "A retired special forces officer is trapped in a time loop where assassins kill him every day. Violent, fast-paced loop action with Frank Grillo and Mel Gibson.",
+    streaming: [{name:"Hulu", cls:"hulu"}]
+  },
+  {
+    title: "The Endless",
+    year: 2017,
+    rt: 92,
+    type: "Time Loop",
+    genres: ["Sci-Fi", "Thriller", "Horror"],
+    director: "Moorhead & Benson",
+    synopsis: "Two brothers return to the cult they escaped as teens and discover the area is trapped in overlapping time loops controlled by an unseen force.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Synchronic",
+    year: 2019,
+    rt: 79,
+    type: "Time Travel",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Moorhead & Benson",
+    synopsis: "Two paramedics encounter a designer drug that causes users to time travel. One of them takes it to rescue a missing person, with dangerous consequences.",
+    streaming: [{name:"Netflix", cls:"netflix"}, {name:"Rent/Buy", cls:"rent"}]
+  },
+  {
+    title: "Time Lapse",
+    year: 2014,
+    rt: 79,
+    type: "Alt Timeline",
+    genres: ["Sci-Fi", "Thriller"],
+    director: "Bradley King",
+    synopsis: "Three friends discover a camera that takes photos 24 hours into the future and use it for personal gain, but paranoia and greed quickly take over.",
+    streaming: [{name:"Tubi", cls:"tubi"}, {name:"Rent/Buy", cls:"rent"}]
+  }
+];
+
+let currentSort = { col: 'rt', dir: 'desc' };
+let activeScoreFilter = null;
+let activeGenreFilter = null;
+
+function getScoreClass(score) {
+  if (score >= 80) return 'rt-fresh';
+  if (score >= 60) return 'rt-good';
+  return 'rt-mixed';
+}
+
+function getTypeClass(type) {
+  const map = { 'Time Loop': 'type-loop', 'Time Travel': 'type-travel', 'Paradox': 'type-paradox', 'Alt Timeline': 'type-alt' };
+  return map[type] || 'type-travel';
+}
+
+function getTomato(score) {
+  return score >= 60 ? '\uD83C\uDF45' : '\uD83E\uDD22';
+}
+
+function renderMovies(list) {
+  const tbody = document.getElementById('movieBody');
+  const noResults = document.getElementById('noResults');
+
+  if (list.length === 0) {
+    tbody.innerHTML = '';
+    noResults.style.display = 'block';
+    document.getElementById('movieCount').textContent = '0';
+    return;
+  }
+
+  noResults.style.display = 'none';
+  document.getElementById('movieCount').textContent = list.length;
+
+  tbody.innerHTML = list.map(m => `
+    <tr>
+      <td>
+        <span class="movie-title">${m.title}</span>
+        <span class="movie-year">(${m.year})</span>
+      </td>
+      <td>${m.year}</td>
+      <td><span class="rt-score ${getScoreClass(m.rt)}">${getTomato(m.rt)} ${m.rt}%</span></td>
+      <td><span class="time-type ${getTypeClass(m.type)}">${m.type}</span></td>
+      <td>${m.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}</td>
+      <td class="director">${m.director}</td>
+      <td class="synopsis">${m.synopsis}</td>
+      <td>
+        <div class="streaming-tags">
+          ${m.streaming.map(s => `<span class="stream-tag stream-${s.cls}">${s.name}</span>`).join('')}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterMovies() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const decade = document.getElementById('decadeFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  const stream = document.getElementById('streamFilter').value;
+
+  let filtered = movies.filter(m => {
+    const matchSearch = !search ||
+      m.title.toLowerCase().includes(search) ||
+      m.director.toLowerCase().includes(search) ||
+      m.synopsis.toLowerCase().includes(search) ||
+      m.genres.some(g => g.toLowerCase().includes(search));
+
+    let matchDecade = true;
+    if (decade === '1980') matchDecade = m.year < 1990;
+    else if (decade) matchDecade = m.year >= parseInt(decade) && m.year < parseInt(decade) + 10;
+
+    const matchType = !type || m.type === type;
+
+    const matchStream = !stream || m.streaming.some(s => s.name.includes(stream));
+
+    const matchScore = !activeScoreFilter || m.rt >= activeScoreFilter;
+
+    const matchGenre = !activeGenreFilter || m.genres.includes(activeGenreFilter);
+
+    return matchSearch && matchDecade && matchType && matchStream && matchScore && matchGenre;
+  });
+
+  filtered.sort((a, b) => {
+    let valA, valB;
+    switch (currentSort.col) {
+      case 'title': valA = a.title; valB = b.title; break;
+      case 'year': valA = a.year; valB = b.year; break;
+      case 'rt': valA = a.rt; valB = b.rt; break;
+      case 'director': valA = a.director; valB = b.director; break;
+      default: valA = a.rt; valB = b.rt;
+    }
+    if (typeof valA === 'string') {
+      return currentSort.dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    }
+    return currentSort.dir === 'asc' ? valA - valB : valB - valA;
+  });
+
+  renderMovies(filtered);
+}
+
+function sortTable(col) {
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.remove('sorted-asc', 'sorted-desc');
+  });
+
+  if (currentSort.col === col) {
+    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.col = col;
+    currentSort.dir = col === 'title' || col === 'director' ? 'asc' : 'desc';
+  }
+
+  const th = document.querySelector(`th[data-col="${col}"]`);
+  th.classList.add(currentSort.dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+  filterMovies();
+}
+
+function toggleScoreFilter(el) {
+  const min = parseInt(el.dataset.min);
+  document.querySelectorAll('.chip[data-min]').forEach(c => c.classList.remove('active'));
+
+  if (activeScoreFilter === min) {
+    activeScoreFilter = null;
+  } else {
+    activeScoreFilter = min;
+    el.classList.add('active');
+  }
+  filterMovies();
+}
+
+function toggleGenreFilter(el) {
+  const genre = el.dataset.genre;
+  document.querySelectorAll('.chip[data-genre]').forEach(c => c.classList.remove('active'));
+
+  if (activeGenreFilter === genre) {
+    activeGenreFilter = null;
+  } else {
+    activeGenreFilter = genre;
+    el.classList.add('active');
+  }
+  filterMovies();
+}
+
+// Initial render
+filterMovies();
+</script>
+
+</body>
+</html>
